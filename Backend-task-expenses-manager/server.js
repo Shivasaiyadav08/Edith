@@ -35,8 +35,8 @@ try {
   const dnsError = error.syscall === 'querySrv' || error.syscall === 'queryTxt';
   console.error(
     dnsError
-      ? 'MongoDB DNS lookup failed. Check the Atlas hostname and DNS access. See SETUP.md → MongoDB connection errors.'
-      : 'MongoDB connection failed. Check the database user, password, cluster status, and current IP in Atlas Network Access. See SETUP.md.',
+      ? 'MongoDB DNS lookup failed. Check the Atlas hostname and DNS access. See README.md → MongoDB connection errors.'
+      : 'MongoDB connection failed. Check the database user, password, cluster status, and current IP in Atlas Network Access. See README.md.',
   );
   console.error('Connection error:', error.code || error.name);
   process.exit(1);
