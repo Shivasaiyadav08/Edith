@@ -1,4 +1,4 @@
-# Edith — projects, tasks, expenses, and a little AI
+# Edith — AI Powered projects, tasks, expenses, Manager 
 
 **Start with [local setup](#start-locally).** This README covers environment variables, Google login, Resend email, Ultron AI, troubleshooting, and deployment. Run `npm run setup` in the backend folder to generate local defaults and your auth secret.
 
