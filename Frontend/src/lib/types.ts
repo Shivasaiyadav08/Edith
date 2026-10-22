@@ -64,6 +64,7 @@ export interface Config {
   authOrigin?: string;
   google: boolean;
   email: boolean;
+  emailDeliveryLimited?: boolean;
   ai: boolean;
 }
 export interface DraftTask {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, ArrowUpRight, Eye, EyeOff, LockKeyhole, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Eye, EyeOff, Info, LockKeyhole, Sparkles } from 'lucide-react';
 import { authClient, api, errorMessage } from '../lib/api';
 import { Spinner } from '../components/ui';
 import type { Config } from '../lib/types';
@@ -179,6 +179,18 @@ export default function Auth({ mode }: { mode: Mode }) {
                   ? 'Enter your email and we’ll send you a reset link.'
                   : 'Choose a strong password for your workspace.'}
           </p>
+          {mode === 'register' && config?.google && config.emailDeliveryLimited && (
+            <aside className="auth-signup-notice" aria-label="Email signup availability">
+              <Info size={19} aria-hidden="true" />
+              <div>
+                <strong>Continue with Google to get started</strong>
+                <p>
+                  Email verification and password recovery are currently limited on this hosted
+                  demo. Please use Google sign-in when creating your account.
+                </p>
+              </div>
+            </aside>
+          )}
           {(mode === 'login' || mode === 'register') && (
             <>
               <button className="button google-button" onClick={google} disabled={busy}>

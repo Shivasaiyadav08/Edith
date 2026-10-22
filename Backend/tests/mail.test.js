@@ -4,10 +4,25 @@ import { readFile } from 'node:fs/promises';
 import { betterAuth } from 'better-auth';
 import { memoryAdapter } from 'better-auth/adapters/memory';
 import { createAuth } from '../lib/auth.js';
-import { mailConfig, mailEnabled, sendMail } from '../lib/mail.js';
+import { mailConfig, mailEnabled, emailDeliveryLimited, sendMail } from '../lib/mail.js';
 
 const origin = 'http://localhost:5173';
 const credentials = { email: 'signup@example.test', password: 'Test-password-12345' };
+test('signup guidance identifies restricted senders without exposing configuration values', (t) => {
+  configure(t);
+  for (const sender of [
+    'Edith <onboarding@resend.dev>',
+    'owner@gmail.com',
+    'Edith <owner@googlemail.com>',
+  ]) {
+    process.env.RESEND_FROM_EMAIL = sender;
+    assert.equal(emailDeliveryLimited(), true);
+  }
+  process.env.RESEND_FROM_EMAIL = 'Edith <hello@example.test>';
+  assert.equal(emailDeliveryLimited(), false);
+  delete process.env.RESEND_API_KEY;
+  assert.equal(emailDeliveryLimited(), true);
+});
 function configure(t, overrides = {}) {
   const env = {
     RESEND_API_KEY: 're_test_not_a_real_key',

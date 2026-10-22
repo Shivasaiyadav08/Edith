@@ -13,7 +13,7 @@ export function mailConfig() {
     throw new Error(
       'Check RESEND_API_KEY and RESEND_FROM_EMAIL. Use an authorized sender on your verified domain.',
     );
-  return { apiKey, from };
+  return { apiKey, from, address };
 }
 
 export function mailEnabled() {
@@ -22,6 +22,16 @@ export function mailEnabled() {
     return true;
   } catch {
     return false;
+  }
+}
+
+export function emailDeliveryLimited() {
+  try {
+    const { address } = mailConfig();
+    // Resend's shared sender is for testing; Gmail domains cannot be verified by this app.
+    return /@(resend\.dev|gmail\.com|googlemail\.com)$/i.test(address);
+  } catch {
+    return true;
   }
 }
 

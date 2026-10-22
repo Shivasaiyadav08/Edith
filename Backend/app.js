@@ -7,7 +7,7 @@ import { ZodError } from 'zod';
 import { requireAuth, attachClientIP } from './middleware/auth.js';
 import { apiRoutes } from './routes/api.js';
 import { aiRoutes } from './routes/ai.js';
-import { mailEnabled } from './lib/mail.js';
+import { mailEnabled, emailDeliveryLimited } from './lib/mail.js';
 import { originSettings } from './lib/origins.js';
 import { mountFrontend } from './lib/frontend.js';
 
@@ -25,6 +25,7 @@ export function createApp(auth, dependencies = {}) {
     res.json({
       google: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
       email: mailEnabled(),
+      emailDeliveryLimited: emailDeliveryLimited(),
       ai: !!process.env.GEMINI_API_KEY?.trim(),
       authOrigin: new URL(process.env.BETTER_AUTH_URL || 'http://localhost:5173').origin,
     }),
