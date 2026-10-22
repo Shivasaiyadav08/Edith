@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const frontendDist = fileURLToPath(
-  new URL('../../Frontend-task-expense-manager/dist/', import.meta.url),
+  new URL('../../Frontend/dist/', import.meta.url),
 );
 
 // In production one Express service serves both the built app and /api.

@@ -17,7 +17,7 @@ if (
     'Set MONGO_URI and a BETTER_AUTH_SECRET of at least 32 characters. See .env.example.',
   );
 if (process.env.NODE_ENV === 'production' && !existsSync(path.join(frontendDist, 'index.html')))
-  throw new Error('Build Frontend-task-expense-manager before starting the production server.');
+  throw new Error('Build Frontend before starting the production server.');
 // Some Windows/Node installations report loopback DNS even without a DNS service.
 // Use working public resolvers for Atlas in that specific case, within this process only.
 if (

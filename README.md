@@ -1,77 +1,124 @@
-# Edith — AI Powered projects, tasks, expenses, Manager 
+# Edith — AI-Powered Project & Expense Management
 
-**Start with [local setup](#start-locally).** This README covers environment variables, Google login, Resend email, Ultron AI, troubleshooting, and deployment. Run `npm run setup` in the backend folder to generate local defaults and your auth secret.
+**One workspace to plan projects, manage tasks, track project finances, and turn everyday inputs into actionable drafts with AI.**
 
-The landing page introduces Edith with a warm editorial design and an interactive project preview. The workspace fills the browser and uses horizontal navigation with compact data cards. Light/dark mode is saved in your browser. **Ultron** is the draggable assistant available throughout the site; there is no separate AI page.
+Edith connects project delivery with financial visibility. Users can organize work, record expenses and revenue, monitor budgets and profit, and ask **Ultron**, the built-in AI assistant, questions about their workspace. It is a full-stack application built with React, TypeScript, Node.js, Express, MongoDB, and Google Gemini.
 
-A simple full-stack app built on the original React + Express + MongoDB project. The landing page explains the product; the dashboard connects projects, tasks, spending, and budgets.
+[Features](#key-features) · [Technology stack](#technology-stack) · [Engineering highlights](#engineering-highlights) · [Local setup](#start-locally) · [Deployment](#production-deployment)
 
-## Contents
+## Key features
 
-- [Features](#what-is-included)
+| Capability               | What users can do                                                                                                                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Project management**   | Organize projects by client, status, due date, budget, and optional recorded revenue.                                                                                                      |
+| **Task planning**        | Manage priorities and deadlines in list or board views; generate task drafts from a project brief.                                                                                         |
+| **Expense tracking**     | Record categorized expenses, link them to projects, mark billable items, and edit records directly from the expense list.                                                                  |
+| **Financial insights**   | Compare spending with budgets, track recorded revenue, and calculate profit or loss for projects with revenue data.                                                                        |
+| **Reports and exports**  | Filter by project and date, inspect spending trends, and export summaries plus every matching project, task, and expense to CSV.                                                           |
+| **Ultron AI assistant**  | Draft expenses from natural language, extract details from receipts and documents, and answer questions using authorized workspace data.                                                   |
+| **Authentication**       | Use email/password or Google sign-in, verify email addresses, and recover accounts through Better Auth and Resend. Email OTP endpoints support verification, sign-in, and password resets. |
+| **Responsive interface** | Work across mobile, tablet, and desktop with light/dark themes, charts, animations, and a draggable assistant.                                                                             |
+
+## Technology stack
+
+| Layer                       | Technologies                                                            | Role                                                                          |
+| --------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **Frontend**                | React 19, TypeScript 5, React Router 7                                  | Typed components, client-side navigation, and protected workspace views       |
+| **Build and styling**       | Vite 7, Tailwind CSS 4, custom CSS                                      | Development tooling, production bundles, and responsive layouts               |
+| **Charts and interaction**  | Recharts 3, Motion, Lucide React                                        | Financial charts, transitions, and interface icons                            |
+| **Backend**                 | Node.js, Express 5, JavaScript ES modules                               | REST API, authentication handlers, and server-side integrations               |
+| **Database**                | MongoDB, Mongoose 8                                                     | Account-scoped records, validation, aggregation, and AI usage tracking        |
+| **Authentication**          | Better Auth, Google OAuth                                               | Database-backed sessions, verification, OTP, and password recovery            |
+| **Artificial intelligence** | Google Gemini, AI SDK, Zod                                              | Structured generation, document extraction, and read-only tool calling        |
+| **Transactional email**     | Resend HTTPS API, native Fetch                                          | Verification, reset, and OTP emails without SMTP connections                  |
+| **Quality and testing**     | Node.js test runner, Supertest, MongoDB Memory Server, ESLint, Prettier | Automated behavior checks, isolated API tests, linting, and formatting        |
+| **Deployment**              | Render, MongoDB Atlas                                                   | Documented hosting path for a shared frontend/API origin and managed database |
+
+## Engineering highlights
+
+- **Authorization enforced by the API.** Database operations scope records to the authenticated user. Project relationships are checked before linking tasks or expenses, preventing cross-account references.
+- **Financial calculations stay deterministic.** Monetary values use integer minor units. MongoDB computes totals, while recorded revenue is distinguished from missing revenue so unknown income does not become an artificial loss.
+- **AI produces reviewable drafts.** Gemini responses for planning and expense extraction follow Zod schemas. Workspace questions use a read-only tool; AI output does not automatically modify records.
+- **Usage and failures are handled explicitly.** AI requests reserve a monthly allowance, have a timeout, and restore the allowance after generation failures. Email delivery uses bounded retries and idempotency keys to avoid duplicate sends during retries.
+- **Session and input protections are built in.** Better Auth manages HttpOnly session cookies, verification, and reset flows. The API validates inputs, enforces allowed origins, and applies rate limits. OTPs are stored hashed and have expiry and attempt limits.
+- **Reports preserve complete results.** Aggregates and CSV exports include matching records beyond the first page. Exported text is escaped to reduce spreadsheet formula injection risks.
+- **The implementation stays approachable.** React Context handles shared workspace state; Express routes, Mongoose models, and small library modules keep feature logic easy to follow. Report charts load on demand, and motion respects the user's reduced-motion preference.
+
+## How Ultron works
+
+| Workflow               | Input                                           | Result                                                              |
+| ---------------------- | ----------------------------------------------- | ------------------------------------------------------------------- |
+| **Plan a project**     | A project brief                                 | A summary and structured task drafts with priorities                |
+| **Capture an expense** | A plain-language description                    | An editable expense draft with amount, category, merchant, and date |
+| **Read a document**    | A receipt image, PDF, or DOCX file              | Extracted expense details for user review                           |
+| **Ask the workspace**  | A question about budgets, spending, or progress | A Markdown answer based on a server-authorized workspace snapshot   |
+
+Requests pass through session checks, input validation, and usage limits before reaching Gemini. The database supplies financial totals; the model explains the available data. Users review generated drafts before saving them. Provider keys remain on the backend.
+
+## Project structure
+
+```text
+Backend/
+  server.js             # Startup, database connection, and shutdown
+  app.js                # Express middleware and route mounting
+  models/               # Projects, tasks, expenses, workspace settings, AI usage
+  routes/api.js         # CRUD, reporting, and CSV exports
+  routes/ai.js          # Gemini workflows and read-only workspace tool
+  middleware/auth.js    # Session checks and trusted client IP handling
+  lib/                  # Auth, email, validation, aggregation, and document parsing
+  scripts/              # Environment setup, mail check, and legacy migration
+  tests/                # Unit and integration tests
+
+Frontend/
+  src/App.tsx           # Routes and protected workspace
+  src/pages/            # Landing, authentication, and workspace screens
+  src/components/       # Shared UI, forms, navigation, charts, and Ultron
+  src/lib/              # API client, types, report helpers, and workspace state
+  src/*.css             # Shared styles, themes, and responsive rules
+  public/               # Brand assets
+```
+
+## Documentation
+
 - [Local setup](#start-locally)
-- [Environment variables and MongoDB troubleshooting](#environment-variables)
+- [Environment variables and database troubleshooting](#environment-variables)
 - [Google sign-in](#google-sign-in)
 - [Resend email and OTP](#email-resend-https-api)
-- [Ultron AI](#ultron-ai)
-- [Currency and date filters](#currency-and-date-filters)
-- [Project structure](#beginner-friendly-structure)
-- [Checks](#checks)
-- [Existing accounts](#existing-accounts)
+- [Gemini configuration and upload limits](#ultron-ai)
+- [Currency and reporting rules](#currency-and-date-filters)
+- [Testing](#testing)
+- [Existing-account migration](#existing-accounts)
 - [Production deployment](#production-deployment)
-
-## What is included
-
-- Animated, responsive landing page with a browser-only sample workspace.
-- Email/password and Google sign-in with Better Auth, HttpOnly session cookies, server-side sign-out, password recovery, and email verification.
-- Projects with clients, due dates, budgets, and optional recorded revenue.
-- Tasks with priorities, due dates, status, and list/board views.
-- Expenses linked to projects, category filters, budget alerts, reports, and CSV export. Overview and Reports have project filters. Date ranges cover project/task creation and expense transaction dates across Overview, Projects, Tasks, Expenses, and Reports. Full report CSV exports include a summary, project finances, every matching task, and every matching expense (not just the first page). Revenue and profit/loss use all-time linked expenses for matching projects with recorded revenue. Expense totals and category summaries follow all active filters.
-- AI task planning, receipt/document extraction, natural-language expense drafts, and private workspace questions with readable Markdown answers. Review drafts before saving.
-
-The first version is deliberately personal: one workspace per account, a selectable currency (USD, INR, EUR, GBP, CAD, AUD, SGD, AED), no billing, team invitations, microservices, or complex state libraries. Receipt images are processed for extraction and are not stored.
 
 ## Start locally
 
-Requires Node.js 22+ and MongoDB (local or Atlas).
+Requires **Node.js 24** (recommended) and **MongoDB**, either locally or through Atlas.
 
-1. Install dependencies in both folders:
-
-   ```sh
-   cd Backend-task-expenses-manager
-   npm install
-   cd ../Frontend-task-expense-manager
-   npm install
-   ```
-
-2. Run `npm run setup` in the backend folder to create `.env` with a generated secret. Local defaults are:
-
-   ```env
-   MONGO_URI=mongodb://127.0.0.1:27017/edith
-   BETTER_AUTH_SECRET=your-random-secret-at-least-32-characters-long
-   BETTER_AUTH_URL=http://localhost:5173
-   FRONTEND_URL=http://localhost:5173
-   ```
-
-   Generate a real secret with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Never commit `.env`.
-
-3. Start the backend in one terminal:
+1. From the repository root, install the locked dependencies and create the backend environment:
 
    ```sh
-   cd Backend-task-expenses-manager
-   npm run dev
+   npm --prefix Backend ci
+   npm --prefix Frontend ci
+   npm --prefix Backend run setup
    ```
 
-4. Start the frontend in another:
+   The setup command creates an ignored `Backend/.env` with a random auth secret. Existing environment files are never overwritten. For Atlas, replace the default local `MONGO_URI` with your database connection string. See [Environment variables](#environment-variables).
+
+2. Start the API in one terminal:
 
    ```sh
-   cd Frontend-task-expense-manager
-   npm run dev
+   npm --prefix Backend run dev
    ```
 
-5. Open **http://localhost:5173**. Vite forwards `/api` to port 5000. Use this same hostname for OAuth and email links.
+3. Start the frontend in a second terminal:
 
-Public demo links have been removed. The `/demo` route exists only during local Vite development for UI testing; it is excluded from production. To test without a database, start just the frontend and open `/demo`. Sample changes stay in browser storage. Demo AI outputs are clearly labeled samples; they do not call a model.
+   ```sh
+   npm --prefix Frontend run dev
+   ```
+
+4. Open **http://localhost:5173**. Vite forwards `/api` requests to Express on port 5000. Use this same hostname for authentication and email links.
+
+**Development preview:** run only the frontend and open `http://localhost:5173/demo` to explore sample data without a database. Preview changes stay in browser storage, and AI responses are labeled samples. This route is available only during Vite development and is excluded from production.
 
 ## Environment variables
 
@@ -103,7 +150,7 @@ After DNS works, a different connection error may require adding your current IP
 | `FRONTEND_URL`    | `http://localhost:5173` | Allowed browser origin and email-link destination.                                     |
 | `TRUST_PROXY`     | `0`                     | Keep off locally. Hosting only: set `1` if one trusted proxy sits in front of Express. |
 
-Both **http://localhost:5173** and **http://127.0.0.1:5173** are accepted in local development. Login, registration, and password-reset pages automatically move to the hostname in `BETTER_AUTH_URL` (normally `localhost`) before starting authentication. This keeps the Google state cookie and callback on the same host. Sessions belong to that hostname. Production trusts only your explicitly configured origins. Your frontend needs no environment variables with the standard Vite proxy. `Frontend-task-expense-manager/.env.example` contains optional `VITE_API_ORIGIN`; leave it blank for this setup.
+Both **http://localhost:5173** and **http://127.0.0.1:5173** are accepted in local development. Login, registration, and password-reset pages automatically move to the hostname in `BETTER_AUTH_URL` (normally `localhost`) before starting authentication. This keeps the Google state cookie and callback on the same host. Sessions belong to that hostname. Production trusts only your explicitly configured origins. Your frontend needs no environment variables with the standard Vite proxy. `Frontend/.env.example` contains optional `VITE_API_ORIGIN`; leave it blank for this setup.
 
 ## Google sign-in
 
@@ -196,33 +243,17 @@ Choose a currency in Settings. The choice is saved per account and used in forms
 
 Date bounds are inclusive calendar dates in UTC. Project/task filters use `createdAt`; expense filters use transaction `date`. Project budget, recorded revenue, and linked-cost figures remain all-time for the projects matching the filters. Full CSV exports include these date rules and applied filters, and quote cells to guard against spreadsheet formulas.
 
-## Beginner-friendly structure
+## Testing
 
-```text
-Backend-task-expenses-manager/
-  server.js             # Database connection and server start
-  app.js                # Express setup and error handling
-  models/               # Project, Task, Expense, AiUsage
-  routes/api.js         # Ordinary CRUD routes and CSV export
-  routes/ai.js          # Four assistant endpoints
-  middleware/auth.js    # Session check
-  lib/                  # Auth, mail, validation, dashboard totals
-  tests/                # Validation and isolated API tests
-  scripts/              # Environment setup and optional legacy migration
+Automated checks cover application behavior and failure cases:
 
-Frontend-task-expense-manager/src/
-  App.tsx               # Page routes and login protection
-  pages/                # Landing, auth, dashboard, and feature screens
-  components/           # Navigation, forms, dialogs, shared cards
-  lib/                  # API client, shared types, demo data, context
-  index.css             # Shared forms, tables, and dialogs
-  edith.css             # Dashboard, dark theme, and Ultron
-  landing.css           # Landing page and responsive styles
-```
-
-React's built-in Context keeps shared data in sync. There is no Redux or custom service framework. CSS animates the charts, and Motion handles dialog transitions. Three.js is unnecessary for this design.
-
-## Checks
+| Area                | Coverage                                                                                                                |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Authentication      | Verification links, OTP expiry and reuse, attempt limits, password resets, session revocation, and OAuth state cookies  |
+| Data access         | User ownership, cross-account access rejection, record validation, and project relationships                            |
+| Financial reporting | Integer-cent values, unknown versus recorded revenue, date boundaries, filters, and complete CSV exports                |
+| AI and email        | Structured outputs, supported document formats, upload limits, quota recovery, provider failures, and safe mail retries |
+| Production routing  | Frontend deep links, API routes, and missing assets                                                                     |
 
 ```sh
 # Frontend folder
@@ -251,13 +282,13 @@ Deploy both folders together as one Render Node Web Service. Express serves the 
    **Build command:**
 
    ```sh
-   npm --prefix Backend-task-expenses-manager ci --omit=dev && npm --prefix Frontend-task-expense-manager ci --include=dev && npm --prefix Frontend-task-expense-manager run build
+   npm --prefix Backend ci --omit=dev && npm --prefix Frontend ci --include=dev && npm --prefix Frontend run build
    ```
 
    **Start command:**
 
    ```sh
-   npm --prefix Backend-task-expenses-manager start
+   npm --prefix Backend start
    ```
 
    Set **Health Check Path** to `/api/health`. Render supplies `PORT` automatically.
