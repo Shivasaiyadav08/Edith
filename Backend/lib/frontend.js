@@ -1,13 +1,13 @@
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
 
-export const frontendDist = fileURLToPath(
-  new URL('../../Frontend/dist/', import.meta.url),
-);
+export const frontendDist = fileURLToPath(new URL('../../Frontend/dist/', import.meta.url));
 
-// In production one Express service serves both the built app and /api.
+// The API runs independently; serve the UI only when a frontend build is present.
 export function mountFrontend(app, directory = frontendDist) {
+  if (!existsSync(path.join(directory, 'index.html'))) return false;
   app.use(express.static(directory, { index: false }));
   app.get('/{*page}', (req, res, next) => {
     if (
@@ -20,4 +20,5 @@ export function mountFrontend(app, directory = frontendDist) {
     res.setHeader('Cache-Control', 'no-cache');
     res.sendFile(path.join(directory, 'index.html'));
   });
+  return true;
 }

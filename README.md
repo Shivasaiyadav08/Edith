@@ -4,7 +4,7 @@
 
 Edith connects project delivery with financial visibility. Users can organize work, record expenses and revenue, monitor budgets and profit, and ask **Ultron**, the built-in AI assistant, questions about their workspace. It is a full-stack application built with React, TypeScript, Node.js, Express, MongoDB, and Google Gemini.
 
-[Features](#key-features) · [Technology stack](#technology-stack) · [Engineering highlights](#engineering-highlights) · [Local setup](#start-locally) · [Deployment](#production-deployment)
+[Features](#key-features) · [Technology stack](#technology-stack) · [Engineering highlights](#engineering-highlights) · [Local setup](#start-locally) · [Testing](#testing)
 
 ## Key features
 
@@ -21,18 +21,17 @@ Edith connects project delivery with financial visibility. Users can organize wo
 
 ## Technology stack
 
-| Layer                       | Technologies                                                            | Role                                                                          |
-| --------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| **Frontend**                | React 19, TypeScript 5, React Router 7                                  | Typed components, client-side navigation, and protected workspace views       |
-| **Build and styling**       | Vite 7, Tailwind CSS 4, custom CSS                                      | Development tooling, production bundles, and responsive layouts               |
-| **Charts and interaction**  | Recharts 3, Motion, Lucide React                                        | Financial charts, transitions, and interface icons                            |
-| **Backend**                 | Node.js, Express 5, JavaScript ES modules                               | REST API, authentication handlers, and server-side integrations               |
-| **Database**                | MongoDB, Mongoose 8                                                     | Account-scoped records, validation, aggregation, and AI usage tracking        |
-| **Authentication**          | Better Auth, Google OAuth                                               | Database-backed sessions, verification, OTP, and password recovery            |
-| **Artificial intelligence** | Google Gemini, AI SDK, Zod                                              | Structured generation, document extraction, and read-only tool calling        |
-| **Transactional email**     | Resend HTTPS API, native Fetch                                          | Verification, reset, and OTP emails without SMTP connections                  |
-| **Quality and testing**     | Node.js test runner, Supertest, MongoDB Memory Server, ESLint, Prettier | Automated behavior checks, isolated API tests, linting, and formatting        |
-| **Deployment**              | Render, MongoDB Atlas                                                   | Documented hosting path for a shared frontend/API origin and managed database |
+| Layer                       | Technologies                                                            | Role                                                                    |
+| --------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Frontend**                | React 19, TypeScript 5, React Router 7                                  | Typed components, client-side navigation, and protected workspace views |
+| **Build and styling**       | Vite 7, Tailwind CSS 4, custom CSS                                      | Development tooling, production bundles, and responsive layouts         |
+| **Charts and interaction**  | Recharts 3, Motion, Lucide React                                        | Financial charts, transitions, and interface icons                      |
+| **Backend**                 | Node.js, Express 5, JavaScript ES modules                               | REST API, authentication handlers, and server-side integrations         |
+| **Database**                | MongoDB, Mongoose 8                                                     | Account-scoped records, validation, aggregation, and AI usage tracking  |
+| **Authentication**          | Better Auth, Google OAuth                                               | Database-backed sessions, verification, OTP, and password recovery      |
+| **Artificial intelligence** | Google Gemini, AI SDK, Zod                                              | Structured generation, document extraction, and read-only tool calling  |
+| **Transactional email**     | Resend HTTPS API, native Fetch                                          | Verification, reset, and OTP emails without SMTP connections            |
+| **Quality and testing**     | Node.js test runner, Supertest, MongoDB Memory Server, ESLint, Prettier | Automated behavior checks, isolated API tests, linting, and formatting  |
 
 ## Engineering highlights
 
@@ -88,7 +87,6 @@ Frontend/
 - [Currency and reporting rules](#currency-and-date-filters)
 - [Testing](#testing)
 - [Existing-account migration](#existing-accounts)
-- [Production deployment](#production-deployment)
 
 ## Start locally
 
@@ -176,22 +174,22 @@ Google accounts and email accounts use the same authentication library. Automati
 
 ## Email: Resend HTTPS API
 
-Edith sends all authentication emails through `https://api.resend.com/emails` on port 443. No SMTP connection or Gmail App Password is used, so this works with Render Free's SMTP restrictions.
+Edith sends authentication emails through the Resend HTTPS API. Verification links, password recovery, and OTP delivery share one server-side email transport.
 
 1. Create a [Resend account](https://resend.com), add a domain you own in **Domains**, and publish the DNS records Resend supplies. Wait until the domain is verified. You cannot verify a shared `onrender.com` domain or use a Gmail address as the sender.
 2. In **API Keys**, create a **Sending access** key restricted to that sending domain. Keep the key private.
-3. Set these variables in the backend `.env` locally or **Render service → Environment** in production:
+3. Set these variables in `Backend/.env`:
 
 ```env
 RESEND_API_KEY=re_REPLACE_WITH_YOUR_PRIVATE_KEY
 RESEND_FROM_EMAIL="Edith <hello@your-verified-domain.com>"
 ```
 
-In Render, enter the sender value without the surrounding quotes. Never use `VITE_` for secrets. Delete the old `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, and `SMTP_FROM` variables; they are no longer read. Restart/redeploy after setting the new values. See [Resend's sending API](https://resend.com/docs/api-reference/emails/send-email).
+Keep API keys on the backend and never prefix them with `VITE_`. Restart the backend after changing these values. See [Resend's sending API](https://resend.com/docs/api-reference/emails/send-email).
 
-For production, also retain `NODE_ENV=production`, `TRUST_PROXY=1`, and set `BETTER_AUTH_URL` and `FRONTEND_URL` to the same public HTTPS origin. Keep your existing auth secret stable. Production startup fails with a configuration message if Resend settings are missing or malformed; it never silently bypasses email verification. Local development can omit both Resend variables and use email/password signup without verification, as before.
+Production startup rejects missing or malformed Resend settings rather than bypassing email verification. For local development, both Resend variables can be omitted; email/password signup then works without verification.
 
-For testing without a domain, use `RESEND_FROM_EMAIL="Edith <onboarding@resend.dev>"` in the backend `.env`. This test sender can only send to your own Resend account email. A verified sending domain is required to send to other users. The sender domain can differ from the app's Render domain. You choose the sender address on that verified domain; you do not need to create a mailbox just to send. [Resend domain restrictions](https://resend.com/docs/api-reference/errors), [verified domains](https://resend.com/docs/dashboard/domains/introduction).
+For testing without a domain, use `RESEND_FROM_EMAIL="Edith <onboarding@resend.dev>"` in the backend `.env`. This test sender can only send to your own Resend account email. A verified sending domain is required to send to other users. The sender domain can differ from the application's domain. You choose the sender address on that verified domain; you do not need to create a mailbox just to send. [Resend domain restrictions](https://resend.com/docs/api-reference/errors), [verified domains](https://resend.com/docs/dashboard/domains/introduction).
 
 The login/register screens still support verification links and resending; password recovery still uses a single-use link. Verification links expire in 1 hour; reset links expire in 30 minutes. Existing accounts, passwords, Google login, and sessions remain supported. Password resets revoke existing sessions.
 
@@ -213,7 +211,7 @@ Use the Better Auth client methods `emailOtp.sendVerificationOtp`, `emailOtp.ver
 
 Run `npm run check:email` in the backend folder to validate environment syntax without sending mail. To explicitly send a test email, run `npm run check:email -- your-test-address@yourdomain.com`. A successful response means Resend accepted the request; check **Resend → Emails**, inbox, and spam to confirm delivery. A sending-only key does not need broad account permissions.
 
-On the password-recovery form, enter the email registered with Edith. If it reports that email delivery is unavailable, check that the running backend has both Resend variables and that the frontend can reach `/api/config`. Restart locally, or redeploy the Render backend after changing its environment, then refresh the page.
+On the password-recovery form, enter the email registered with Edith. If it reports that email delivery is unavailable, check that the running backend has both Resend variables and that the frontend can reach `/api/config`. Restart the backend after changing its environment, then refresh the page.
 
 The transport throws a safe 503 error for failed delivery, and explicit verification resends expose that safe message. Better Auth intentionally catches background email errors for signup, reset requests, and OTP requests, preserving generic responses; a 200 from those endpoints does not prove email delivery. Failed sends never grant an unverified session. Check the HTTP status logged by the backend and the Resend dashboard for details. Network failures, timeouts, rate limits, and server errors get one bounded retry with the same idempotency key. Permanent errors are not retried. Secrets, recipient addresses, verification URLs, and codes are never included in mail error logs.
 
@@ -229,7 +227,7 @@ GEMINI_API_KEY=your-private-google-ai-studio-key
 GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
-Restart Express after adding the key. Ultron calls Google directly; no Vercel account or AI Gateway key is needed. Old `AI_GATEWAY_` variables are unused and may be removed. Without a Gemini key, the demo shows labeled sample results and real accounts show that AI is unconfigured. [Google API key guide](https://ai.google.dev/gemini-api/docs/api-key).
+Restart Express after adding the key. Ultron calls Gemini directly using the backend API key. Without a Gemini key, the demo shows labeled sample results and real accounts show that AI is unconfigured. [Google API key guide](https://ai.google.dev/gemini-api/docs/api-key).
 
 Model access, free-tier eligibility, and usage limits depend on your Google project. Stay on an eligible free-tier project if you do not want paid usage. Check [current pricing](https://ai.google.dev/gemini-api/docs/pricing) and your AI Studio quota. Free-tier inputs and outputs may be used to improve Google's products; use sample receipts while testing. Model capabilities: [Gemini 3.5 Flash-Lite](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash-lite).
 
@@ -270,54 +268,3 @@ Integration tests start an isolated temporary MongoDB instance and use fake prov
 ## Existing accounts
 
 Back up your original database before running `npm run migrate:legacy` in the backend. The optional script preserves original collections, imports accounts into Better Auth, and adds task status and integer-cent expense fields. Bcrypt passwords stay usable. Old JWT sessions are retired. Do not migrate into a database where the same emails have already registered new accounts without resolving ownership first.
-
-## Production deployment
-
-Deploy both folders together as one Render Node Web Service. Express serves the built frontend and the API on the same HTTPS origin, which keeps authentication cookies and callbacks on one domain. Resend uses HTTPS, so email delivery does not need paid hosting to bypass SMTP restrictions.
-
-1. Push both app folders and their lockfiles to GitHub. Keep private environment files out of Git.
-2. Create a MongoDB Atlas database user and copy the connection string, including the database name (for example, `edith`).
-3. In Render, create a **Web Service**, connect the repository, select Node, and leave **Root Directory** blank. Use these commands from the repository root.
-
-   **Build command:**
-
-   ```sh
-   npm --prefix Backend ci --omit=dev && npm --prefix Frontend ci --include=dev && npm --prefix Frontend run build
-   ```
-
-   **Start command:**
-
-   ```sh
-   npm --prefix Backend start
-   ```
-
-   Set **Health Check Path** to `/api/health`. Render supplies `PORT` automatically.
-
-4. Add these variables in **Render → Service → Environment**. Replace all placeholders and use your actual public URL for both origin variables.
-
-   ```env
-   NODE_ENV=production
-   NODE_VERSION=24
-   TRUST_PROXY=1
-   MONGO_URI=YOUR_ATLAS_CONNECTION_STRING_WITH_DATABASE_NAME
-   BETTER_AUTH_SECRET=YOUR_PRIVATE_RANDOM_SECRET
-   BETTER_AUTH_URL=https://YOUR-SERVICE.onrender.com
-   FRONTEND_URL=https://YOUR-SERVICE.onrender.com
-   RESEND_API_KEY=re_YOUR_PRIVATE_KEY
-   RESEND_FROM_EMAIL=Edith <hello@your-verified-domain.com>
-   GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID
-   GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET
-   GEMINI_API_KEY=YOUR_GEMINI_KEY
-   ```
-
-   Google and Gemini credentials are optional if those features are disabled. Both Resend values are required in production. Generate the auth secret using the command in [Environment variables](#environment-variables), and keep an existing production secret stable. In the Render dashboard, enter values without surrounding quotes. Leave `VITE_API_ORIGIN` unset for this single-service setup.
-
-5. In Render, open **Connect → Outbound** and add all listed IP ranges to Atlas **Network Access → IP Access List**.
-6. Configure Google OAuth with your public HTTPS origin and the exact redirect URI `https://YOUR-SERVICE.onrender.com/api/auth/callback/google`. Add test users while the consent screen is in testing, or publish it for public access and complete any verification Google requires. Verify the Resend sender domain as described in [Email](#email-resend-https-api).
-7. Deploy or redeploy after saving the environment. Check that `/api/health` returns `{"status":"ok"}`. Test signup verification, Google login, password recovery, AI, currency selection, CSV export, and refreshing an internal route such as `/reports`.
-
-When switching to a custom domain, update both public URL variables and Google's origin/callback settings, then redeploy. The email sender can use a different verified domain from the application's domain.
-
-Live Google consent, inbox delivery, and AI generations require your own provider credentials; builds and simulated tests cannot confirm those integrations. Rotate any real provider credentials previously placed in a shared environment template.
-
-Hosting references: [Render Node deployment](https://render.com/docs/deploy-node-express-app), [Render outbound IP addresses](https://render.com/docs/outbound-ip-addresses), and [Atlas IP access lists](https://www.mongodb.com/docs/atlas/security/ip-access-list/).

@@ -1,9 +1,6 @@
 import 'dotenv/config';
 import dns from 'node:dns';
 import mongoose from 'mongoose';
-import { existsSync } from 'node:fs';
-import { frontendDist } from './lib/frontend.js';
-import path from 'node:path';
 import { createApp } from './app.js';
 import { createAuth } from './lib/auth.js';
 import { mailConfig } from './lib/mail.js';
@@ -16,8 +13,6 @@ if (
   throw new Error(
     'Set MONGO_URI and a BETTER_AUTH_SECRET of at least 32 characters. See .env.example.',
   );
-if (process.env.NODE_ENV === 'production' && !existsSync(path.join(frontendDist, 'index.html')))
-  throw new Error('Build Frontend before starting the production server.');
 // Some Windows/Node installations report loopback DNS even without a DNS service.
 // Use working public resolvers for Atlas in that specific case, within this process only.
 if (
