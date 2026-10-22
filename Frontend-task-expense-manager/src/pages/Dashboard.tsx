@@ -1,69 +1,74 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { getTasks, getExpenses } from "../api/api";
+import { useState } from 'react';
+import { CalendarDays, Plus, Link2 } from 'lucide-react';
+import OverviewBoard from '../components/OverviewBoard';
+import ResourceForm from '../components/ResourceForm';
+import FinancialSummary from '../components/FinancialSummary';
+import { useWorkspace } from '../lib/workspace-context';
+import useReport from '../lib/useReport';
+import { Spinner } from '../components/ui';
+import DateFilter from '../components/DateFilter';
 
-interface Task {
-  _id: string;
-  title: string;
-  completed: boolean;
-}
-interface Expense {
-  _id: string;
-  title: string;
-  amount: number;
-  category: string;
-}
-interface DashboardProps{
-  token:string,
-  name:string
-}
-
-const Dashboard: React.FC<DashboardProps> = ({ token ,name}) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
- 
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const tasksRes = await getTasks(token);
-      setTasks(tasksRes.data);
-      const expensesRes = await getExpenses(token);
-      setExpenses(expensesRes.data);
-      // setName(localStorage.)
-    };
-    fetchData();
-  }, [token]);
-
-  const totalExpenses = useMemo(() => {
-    return expenses.reduce((sum, e) => sum + e.amount, 0);
-  }, [expenses]);
-
+export default function Dashboard() {
+  const [newProject, setNewProject] = useState(false);
+  const [project, setProject] = useState('');
+  const [period, setPeriod] = useState({ from: '', to: '' });
+  const { data, workspace } = useWorkspace();
+  const report = useReport(project, period.from, period.to);
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold mb-8 text-gray-800 text-center">
-        Welcome to Your Dashboard {name}
-      </h1>
-
-      {/* Responsive Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="bg-blue-500 text-white p-6 rounded-xl shadow hover:scale-105 transform transition">
-          <h3 className="text-lg font-medium">Total Tasks</h3>
-          <p className="text-3xl font-bold mt-2">{tasks.length}</p>
+    <>
+      <div className="overview-heading">
+        <div>
+          <span className="section-kicker">YOUR WORKSPACE, AT A GLANCE</span>
+          <h1>
+            Overview <Link2 size={20} />
+          </h1>
+          <p>Projects, progress, and every expense. One connected picture.</p>
         </div>
-
-        <div className="bg-green-500 text-white p-6 rounded-xl shadow hover:scale-105 transform transition">
-          <h3 className="text-lg font-medium">Completed Tasks</h3>
-          <p className="text-3xl font-bold mt-2">
-            {tasks.filter((t) => t.completed).length}
-          </p>
-        </div>
-
-        <div className="bg-red-500 text-white p-6 rounded-xl shadow hover:scale-105 transform transition">
-          <h3 className="text-lg font-medium">Total Expenses</h3>
-          <p className="text-3xl font-bold mt-2">${totalExpenses}</p>
+        <div className="overview-actions">
+          <label className="project-filter">
+            Project
+            <select
+              aria-label="Overview project"
+              value={project}
+              onChange={(e) => setProject(e.target.value)}
+            >
+              <option value="">All projects</option>
+              {data?.projects.map((p) => (
+                <option key={p._id} value={p._id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span className="period-pill">
+            <CalendarDays size={13} />
+            {period.from || period.to ? 'Selected activity dates' : 'All recorded activity'}
+          </span>
+          <button className="button button-dark" onClick={() => setNewProject(true)}>
+            <Plus size={14} />
+            New project
+          </button>
         </div>
       </div>
-    </div>
+      <DateFilter onApply={setPeriod} />
+      {report.error && (
+        <p role="alert" className="form-alert error">
+          {report.error}
+        </p>
+      )}
+      {report.busy ? (
+        <div className="report-loading">
+          <Spinner /> Updating project overview…
+        </div>
+      ) : (
+        report.data && (
+          <>
+            <OverviewBoard snapshot={report.data} />
+            <FinancialSummary projects={report.data.projects} currency={workspace.currency} />
+          </>
+        )
+      )}
+      {newProject && <ResourceForm resource="projects" onClose={() => setNewProject(false)} />}
+    </>
   );
-};
-
-export default Dashboard;
+}

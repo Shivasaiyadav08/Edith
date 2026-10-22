@@ -1,3 +1,0 @@
-\
-
-Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YmFhYTFmMzk4MWQyZTJkNzZhOWJiZCIsImlhdCI6MTc1NzA2MzkyNywiZXhwIjoxNzU3MTUwMzI3fQ.Zevb1YLPPi9Dq-KeoXMbTlpb3YITyBzvSS6PXfypGlI

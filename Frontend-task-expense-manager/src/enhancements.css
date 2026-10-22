@@ -1,0 +1,350 @@
+/* Shared reporting and richer light-theme details. */
+.project-filter {
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 190px;
+  gap: 5px;
+}
+.project-filter select {
+  font-size: 12px;
+  padding: 8px 11px;
+}
+.report-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 65px;
+  color: var(--muted);
+}
+.finance-summary {
+  margin: 22px 0 28px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--paper);
+}
+.finance-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 18px;
+}
+.finance-caption > strong {
+  font-size: 15px;
+  font-weight: 500;
+}
+.finance-caption > span {
+  font-size: 10px;
+  color: var(--muted);
+}
+.finance-summary > p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.finance-summary > small {
+  display: block;
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 15px;
+}
+.finance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+.finance-grid article {
+  background: var(--subtle);
+  padding: 20px;
+  border-radius: 9px;
+  min-width: 0;
+}
+.finance-grid article > span {
+  font-size: 11px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 12px;
+}
+.finance-grid article > strong {
+  font-size: clamp(23px, 2.4vw, 35px);
+  font-weight: 500;
+  letter-spacing: -1px;
+}
+.finance-grid .finance-profit {
+  background: #dcf3e8;
+  color: #17624c;
+}
+.finance-grid .finance-loss {
+  background: #ffe2dc;
+  color: #a63629;
+}
+.finance-profit-text {
+  color: #26916f !important;
+  font-weight: 500;
+}
+.finance-loss-text,
+.danger-text {
+  color: #d65c4d !important;
+  font-weight: 500;
+}
+.report-range {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.report-range > label:first-child {
+  margin-right: auto;
+  min-width: 210px;
+}
+.report-range > span {
+  margin-right: 0;
+}
+.edith-chat .assistant-answer {
+  white-space: normal;
+  font-size: 13px;
+  line-height: 1.85;
+  overflow-wrap: anywhere;
+}
+.assistant-answer p {
+  margin: 0 0 13px;
+}
+.assistant-answer strong {
+  color: var(--ink);
+  font-weight: 650;
+}
+.assistant-answer h1,
+.assistant-answer h2,
+.assistant-answer h3 {
+  font-size: 16px;
+  margin: 18px 0 10px;
+  line-height: 1.4;
+}
+.assistant-answer ul,
+.assistant-answer ol {
+  padding-left: 22px;
+  margin: 12px 0 18px;
+  list-style: revert;
+}
+.assistant-answer li {
+  margin: 7px 0;
+}
+.assistant-answer li > p {
+  margin-bottom: 5px;
+}
+.assistant-answer code {
+  background: var(--subtle);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+.assistant-answer pre {
+  background: var(--subtle);
+  padding: 12px;
+  overflow: auto;
+  border-radius: 7px;
+  white-space: pre;
+}
+.assistant-answer blockquote {
+  border-left: 3px solid var(--blue);
+  margin: 14px 0;
+  padding-left: 13px;
+  color: var(--muted);
+}
+.assistant-answer a {
+  color: var(--blue);
+  text-decoration: underline;
+}
+.receipt-image-preview > svg {
+  margin: 20px;
+  color: var(--blue);
+}
+.product-nav > nav > a {
+  font-size: 12px;
+}
+.nav-tools .button {
+  font-size: 11px;
+}
+.section-kicker,
+.page-heading .eyebrow {
+  font-size: 9px;
+}
+.page-heading p,
+.overview-heading p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.card-heading h2 {
+  font-size: 15px;
+}
+.inline-metrics span {
+  font-size: 10px;
+}
+.inline-metrics strong {
+  font-size: 19px;
+}
+.inline-metrics > div {
+  opacity: 0.8;
+}
+.inline-metrics > div.metric-active {
+  opacity: 1;
+}
+.compact-expense strong {
+  font-size: 11px;
+}
+.compact-expense small {
+  font-size: 10px;
+}
+.data-card,
+.project-card,
+.panel,
+.table-panel {
+  box-shadow: 0 3px 12px #1a385407;
+}
+.project-card {
+  border-top: 3px solid #7dabea;
+}
+[data-theme='light'] .stat-card:nth-child(1) {
+  background: var(--tint-blue);
+}
+[data-theme='light'] .stat-card:nth-child(2) {
+  background: var(--tint-green);
+}
+[data-theme='light'] .stat-card:nth-child(3) {
+  background: var(--tint-orange);
+}
+[data-theme='light'] .stat-card:nth-child(4) {
+  background: var(--tint-yellow);
+}
+[data-theme='light'] .expense-total {
+  background: #dfeaff;
+  color: #18345f;
+}
+[data-theme='light'] .receipt-prompt {
+  background: #dbf1e9;
+  color: #244d43;
+}
+[data-theme='light'] .project-icon.violet,
+[data-theme='light'] .project-icon.blue {
+  background: #dceaff;
+  color: #3470c8;
+}
+[data-theme='light'] .project-icon.green {
+  background: #def3dc;
+  color: #378e63;
+}
+[data-theme='light'] .project-icon.orange {
+  background: #ffe7cc;
+  color: #b87924;
+}
+[data-theme='light'] .progress-track > span {
+  background: #4a87e0;
+}
+[data-theme='light'] .demo-banner {
+  background: #e0ecfd;
+}
+[data-theme='light'] .budget-volume {
+  border-top: 3px solid #52bd9c;
+}
+[data-theme='light'] .completion-card {
+  border-top: 3px solid #f2b749;
+}
+[data-theme='light'] .latest-card {
+  border-top: 3px solid #78a9ed;
+}
+[data-theme='light'] .edith-insight {
+  background: #ffb58c;
+  border-color: #f4aa7f;
+}
+[data-theme='dark'] .finance-grid .finance-profit {
+  background: #213f36;
+  color: #8bdbb5;
+}
+[data-theme='dark'] .finance-grid .finance-loss {
+  background: #492c2c;
+  color: #eea69a;
+}
+@media (max-width: 680px) {
+  .overview-actions {
+    flex-wrap: wrap;
+  }
+  .project-filter {
+    width: 100%;
+  }
+  .finance-summary {
+    padding: 17px;
+  }
+  .finance-caption {
+    display: block;
+  }
+  .finance-caption > span {
+    display: block;
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+  .finance-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .finance-grid article {
+    padding: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .finance-grid article > span {
+    margin: 0;
+  }
+  .finance-grid article > strong {
+    font-size: 25px;
+  }
+  .finance-summary > small {
+    line-height: 1.8;
+  }
+  .report-range > label:first-child {
+    min-width: 0;
+    width: 100%;
+  }
+  .inline-metrics span {
+    font-size: 8px;
+  }
+  .inline-metrics strong {
+    font-size: 16px;
+  }
+  .card-heading h2 {
+    font-size: 13px;
+  }
+}
+
+/* Shared date controls and keyboard-accessible expense rows. */
+.report-range {
+  margin-bottom: 22px;
+}
+.date-filter > small {
+  flex-basis: 100%;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.report-date-note {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+  margin: -8px 0 22px;
+}
+.expense-row {
+  cursor: pointer;
+}
+.expense-row:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: -2px;
+}
+.resend-verification {
+  display: block;
+  margin: 16px auto 0;
+}
+.resend-verification:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
