@@ -61,10 +61,6 @@ export interface Snapshot {
   usage: { requests: number; limit: number };
 }
 export interface Config {
-  authOrigin?: string;
-  google: boolean;
-  email: boolean;
-  emailDeliveryLimited?: boolean;
   ai: boolean;
 }
 export interface DraftTask {

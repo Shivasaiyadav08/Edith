@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { LockKeyhole, Save } from 'lucide-react';
+import { LockKeyhole } from 'lucide-react';
+import { useClerk } from '@clerk/react';
 import { useWorkspace } from '../lib/workspace-context';
-import { authClient, errorMessage } from '../lib/api';
+import { errorMessage } from '../lib/api';
 import { PageHeading, Spinner } from '../components/ui';
 import { currencies } from '../lib/types';
 
 export default function Settings() {
-  const { user, data, demo, config, notify, workspace, setCurrency } = useWorkspace();
+  const { user, data, demo, notify, workspace, setCurrency } = useWorkspace();
+  const { openUserProfile } = useClerk();
   const [currency, chooseCurrency] = useState(workspace.currency),
     [acknowledge, setAcknowledge] = useState(false);
-  const [name, setName] = useState(user.name),
-    [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState(false);
   return (
     <>
       <PageHeading
@@ -83,32 +84,10 @@ export default function Settings() {
             <h2>Your profile</h2>
             <span className="avatar">{user.name[0]}</span>
           </div>
-          <form
-            className="resource-form"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setBusy(true);
-              try {
-                if (demo) throw new Error('Profile changes need a connected account.');
-                const result = await authClient.updateUser({ name });
-                if (result.error) throw new Error(result.error.message);
-                notify('Profile updated.');
-              } catch (err) {
-                notify(errorMessage(err));
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
+          <div className="resource-form">
             <label>
               Full name
-              <input
-                required
-                minLength={2}
-                maxLength={100}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+              <input value={user.name} readOnly />
             </label>
             <label>
               Email address
@@ -119,51 +98,29 @@ export default function Settings() {
                 ? 'Your email is verified.'
                 : 'Your email has not been verified yet.'}
             </span>
-            <button className="button button-dark" disabled={busy}>
-              {busy ? (
-                <Spinner />
-              ) : (
-                <>
-                  <Save size={15} />
-                  Save profile
-                </>
-              )}
+            <button
+              className="button button-dark"
+              disabled={demo}
+              onClick={() => openUserProfile()}
+            >
+              Manage account
             </button>
-          </form>
+          </div>
         </section>
         <section className="panel settings-security">
           <LockKeyhole size={23} />
           <h2>A secure place for your work.</h2>
           <p>
-            Edith uses server-managed sessions and supports Google sign-in. Password recovery is
-            available when email delivery is configured.
+            Clerk manages your sign-in methods, verified email addresses, passwords, and active
+            devices.
           </p>
-          <a className="button button-outline" href="/forgot-password">
-            Reset your password
-          </a>
-          {!user.emailVerified && config.email && (
-            <button
-              className="text-link"
-              disabled={busy}
-              onClick={async () => {
-                setBusy(true);
-                try {
-                  const result = await authClient.sendVerificationEmail({
-                    email: user.email,
-                    callbackURL: `${window.location.origin}/dashboard`,
-                  });
-                  if (result.error) throw new Error(result.error.message);
-                  notify('Verification email sent.');
-                } catch (err) {
-                  notify(errorMessage(err));
-                } finally {
-                  setBusy(false);
-                }
-              }}
-            >
-              Send verification email
-            </button>
-          )}
+          <button
+            className="button button-outline"
+            disabled={demo}
+            onClick={() => openUserProfile()}
+          >
+            Account security
+          </button>
           <p className="input-hint">
             AI usage: {data?.usage.requests || 0} of 20 requests this calendar month. All budgets
             and expenses use {workspace.currency}.

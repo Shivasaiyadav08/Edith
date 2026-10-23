@@ -19,8 +19,6 @@ export default function WorkspaceProvider({
 }) {
   const [data, setData] = useState<Snapshot | null>(() => (demo ? readDemo() : null));
   const [config, setConfig] = useState<Config>({
-    google: false,
-    email: false,
     ai: false,
   });
   const [loading, setLoading] = useState(!demo);

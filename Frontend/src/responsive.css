@@ -129,14 +129,6 @@ select {
 .chart-legend > div {
   flex-wrap: wrap;
 }
-.auth-form-wrap {
-  width: min(100%, 410px);
-}
-.auth-main,
-.auth-form-wrap,
-.auth-form {
-  min-width: 0;
-}
 .workspace-footer,
 .demo-banner {
   flex-wrap: wrap;
@@ -574,7 +566,6 @@ select {
   .resource-form input:not([type='checkbox']),
   .resource-form select,
   .resource-form textarea,
-  .auth-form input:not([type='checkbox']),
   .report-range input,
   .report-range select {
     font-size: 16px;
@@ -582,27 +573,6 @@ select {
   }
   .modal-actions > .button {
     flex: 1 1 100px;
-  }
-  .auth-main {
-    padding: 24px 16px;
-  }
-  .auth-form-wrap {
-    max-width: 410px;
-    padding: 24px 20px;
-    margin-top: 48px;
-  }
-  .auth-form-wrap h1 {
-    font-size: 27px;
-    line-height: 1.4;
-  }
-  .auth-form-options {
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .auth-footer,
-  .auth-footnote {
-    flex-wrap: wrap;
-    line-height: 1.8;
   }
   .edith-chat {
     left: 8px !important;
@@ -750,5 +720,42 @@ select {
   }
   .completion-main strong {
     font-size: 36px;
+  }
+}
+
+/* Clerk shares the workspace palette in both themes. */
+.clerk-auth-page {
+  min-height: 100dvh;
+  padding: clamp(16px, 4vw, 40px);
+  background: var(--surface);
+}
+.auth-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.auth-topbar a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.clerk-auth-content {
+  display: grid;
+  place-items: center;
+  padding: 32px 0;
+  min-width: 0;
+}
+.clerk-auth-content .cl-rootBox {
+  width: min(100%, 400px);
+}
+.clerk-auth-content .cl-cardBox {
+  width: 100%;
+  max-width: 100%;
+}
+@media (max-width: 480px) {
+  .clerk-auth-page {
+    padding: 16px 12px;
   }
 }

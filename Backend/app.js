@@ -2,16 +2,15 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
-import { toNodeHandler } from 'better-auth/node';
+import { clerkMiddleware } from '@clerk/express';
 import { ZodError } from 'zod';
-import { requireAuth, attachClientIP } from './middleware/auth.js';
+import { requireAuth } from './middleware/auth.js';
 import { apiRoutes } from './routes/api.js';
 import { aiRoutes } from './routes/ai.js';
-import { mailEnabled, emailDeliveryLimited } from './lib/mail.js';
 import { originSettings } from './lib/origins.js';
 import { mountFrontend } from './lib/frontend.js';
 
-export function createApp(auth, dependencies = {}) {
+export function createApp(dependencies = {}) {
   const app = express();
   const { origins } = originSettings();
   app.locals.aiGenerate = dependencies.generate;
@@ -19,19 +18,13 @@ export function createApp(auth, dependencies = {}) {
   if (process.env.TRUST_PROXY === '1') app.set('trust proxy', 1);
   app.use(helmet());
   app.use(cors({ origin: origins, credentials: true }));
-  app.use('/api', attachClientIP);
   app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
   app.get('/api/config', (req, res) =>
     res.json({
-      google: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-      email: mailEnabled(),
-      emailDeliveryLimited: emailDeliveryLimited(),
       ai: !!process.env.GEMINI_API_KEY?.trim(),
-      authOrigin: new URL(process.env.BETTER_AUTH_URL || 'http://localhost:5173').origin,
     }),
   );
-  // Better Auth reads its own body and must come before express.json().
-  app.all('/api/auth/*splat', toNodeHandler(auth));
+  app.use('/api', dependencies.authenticate || clerkMiddleware({ authorizedParties: origins }));
   app.use(express.json({ limit: '7mb' }));
   app.use('/api', (req, res, next) => {
     if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && !origins.includes(req.headers.origin))
@@ -47,7 +40,7 @@ export function createApp(auth, dependencies = {}) {
       legacyHeaders: false,
       message: { message: 'Too many requests. Try again in a minute.' },
     }),
-    requireAuth(auth),
+    requireAuth,
   );
   app.use(
     '/api/ai',

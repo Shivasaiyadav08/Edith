@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowDownToLine, CreditCard, Plus, Search, Sparkles, Trash2, Receipt } from 'lucide-react';
 import { useWorkspace } from '../lib/workspace-context';
-import { apiBase, errorMessage } from '../lib/api';
+import { apiFetch, errorMessage } from '../lib/api';
 import { PageHeading, Empty, Spinner } from '../components/ui';
 import { DeleteConfirm } from '../components/workspace-ui';
 import ResourceForm from '../components/ResourceForm';
@@ -67,9 +67,7 @@ export default function Expenses() {
           { type: 'text/csv;charset=utf-8' },
         );
       } else {
-        const res = await fetch(`${apiBase}/export/expenses?${report.query}`, {
-          credentials: 'include',
-        });
+        const res = await apiFetch(`/export/expenses?${report.query}`);
         if (!res.ok) throw new Error('Export could not be completed.');
         blob = await res.blob();
       }

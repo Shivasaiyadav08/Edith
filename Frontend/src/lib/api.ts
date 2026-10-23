@@ -1,19 +1,20 @@
-import { createAuthClient } from 'better-auth/react';
-import { emailOTPClient } from 'better-auth/client/plugins';
-export const authClient = createAuthClient({
-  baseURL: import.meta.env.VITE_API_ORIGIN || window.location.origin,
-  plugins: [emailOTPClient()],
-});
-export const apiBase = `${import.meta.env.VITE_API_ORIGIN || ''}/api`;
-export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await fetch(`${apiBase}${path}`, {
+import { getToken } from '@clerk/react';
+
+// Vite and Vercel proxy /api to Express; Clerk verifies the session token there.
+const apiBase = '/api';
+export async function apiFetch(path: string, options: RequestInit = {}) {
+  const token = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY ? await getToken() : null;
+  const headers = new Headers(options.headers);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+  return fetch(`${apiBase}${path}`, {
     ...options,
     credentials: 'include',
-    headers: {
-      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-      ...options.headers,
-    },
+    headers,
   });
+}
+export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const res = await apiFetch(path, options);
   if (!res.ok) {
     const data = await res.json().catch(() => ({}));
     throw new Error(data.message || 'Could not complete the request. Please try again.');

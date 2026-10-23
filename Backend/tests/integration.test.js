@@ -6,7 +6,8 @@ import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import supertest from 'supertest';
 import { createApp } from '../app.js';
-import { createAuth } from '../lib/auth.js';
+import Account from '../models/Account.js';
+import { authenticate, sessionToken } from './helpers/clerk.js';
 import AiUsage from '../models/AiUsage.js';
 
 let mongo, app, alice, bob, project, task;
@@ -17,35 +18,29 @@ const write = (agent, method, url, body) =>
     .send(body || {});
 before(
   async () => {
-    process.env.BETTER_AUTH_SECRET = 'test-only-secret-123456789012345678901234567890';
-    process.env.BETTER_AUTH_URL = origin;
     process.env.FRONTEND_URL = origin;
     process.env.GEMINI_API_KEY = 'test-key';
     process.env.GEMINI_MODEL = 'gemini-3.5-flash-lite';
-    delete process.env.RESEND_API_KEY;
-    delete process.env.RESEND_FROM_EMAIL;
-    delete process.env.GOOGLE_CLIENT_ID;
-    delete process.env.GOOGLE_CLIENT_SECRET;
     // Keep test files inside the project instead of the Windows sandbox temp folder.
     const dbPath = path.resolve('.runtime', `test-${Date.now()}`);
     await fs.mkdir(dbPath, { recursive: true });
     mongo = await MongoMemoryServer.create({ instance: { dbPath } });
     await mongoose.connect(mongo.getUri());
     await AiUsage.init();
-    app = createApp(createAuth(mongoose.connection.db));
-    alice = supertest.agent(app);
-    bob = supertest.agent(app);
-    for (const [agent, name] of [
-      [alice, 'Alice'],
-      [bob, 'Bob'],
-    ]) {
-      const response = await write(agent, 'post', '/api/auth/sign-up/email', {
-        name,
-        email: `${name.toLowerCase()}@example.com`,
-        password: 'test-password-12345',
-      });
-      assert.equal(response.status, 200, JSON.stringify(response.body));
-    }
+    await Account.init();
+    app = createApp({ authenticate: authenticate() });
+    alice = supertest
+      .agent(app)
+      .set(
+        'Authorization',
+        'Bearer ' + sessionToken('user_alice', { exp: Math.floor(Date.now() / 1000) + 3600 }),
+      );
+    bob = supertest
+      .agent(app)
+      .set(
+        'Authorization',
+        'Bearer ' + sessionToken('user_bob', { exp: Math.floor(Date.now() / 1000) + 3600 }),
+      );
   },
   { timeout: 180000 },
 );
@@ -54,19 +49,12 @@ after(async () => {
   if (mongo) await mongo.stop();
 });
 
-test('sessions use HttpOnly cookies and APIs reject missing authentication', async () => {
+test('APIs reject missing and forged authentication', async () => {
   assert.equal((await supertest(app).get('/api/overview')).status, 401);
-  const login = await write(supertest(app), 'post', '/api/auth/sign-in/email', {
-    email: 'alice@example.com',
-    password: 'test-password-12345',
-  });
-  assert.equal(login.status, 200);
-  assert.match(login.headers['set-cookie'].join(';'), /HttpOnly/i);
-  const invalid = await write(supertest(app), 'post', '/api/auth/sign-in/email', {
-    email: 'alice@example.com',
-    password: 'incorrect',
-  });
-  assert.equal(invalid.status, 401);
+  assert.equal(
+    (await supertest(app).get('/api/overview').set('Authorization', 'Bearer invalid')).status,
+    401,
+  );
 });
 test('projects, tasks, expenses, and budget totals work together', async () => {
   const p = await write(alice, 'post', '/api/projects', { name: 'Client website', budget: 1000.5 });
@@ -105,6 +93,31 @@ test('users cannot read, update, delete, or link another user’s records', asyn
   const csv = await bob.get('/api/export/expenses');
   assert.equal(csv.status, 200);
   assert.ok(!csv.text.includes('Hosting'));
+});
+
+test('an explicitly linked Clerk account retains its existing MongoDB records and settings', async () => {
+  const owner = new mongoose.Types.ObjectId();
+  await Account.create({ clerkId: 'user_existing', owner });
+  await mongoose.connection.collection('projects').insertOne({
+    user: owner,
+    name: 'Existing workspace project',
+    budgetMinor: 75000,
+    status: 'active',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+  await mongoose.connection.collection('workspaces').insertOne({ user: owner, currency: 'INR' });
+  const response = await supertest(app)
+    .get('/api/overview')
+    .set('Authorization', `Bearer ${sessionToken('user_existing')}`);
+  assert.equal(response.status, 200);
+  assert.equal(response.body.projects[0].name, 'Existing workspace project');
+  assert.equal(response.body.workspace.currency, 'INR');
+  assert.ok(
+    !(await bob.get('/api/overview')).body.projects.some(
+      (p) => p.name === 'Existing workspace project',
+    ),
+  );
 });
 test('API validates money and rejects cross-origin writes', async () => {
   assert.equal(
@@ -165,8 +178,4 @@ test('CSV neutralizes formulas and linked projects are protected from deletion',
   const csv = await alice.get('/api/export/expenses');
   assert.ok(csv.text.includes("'=HYPERLINK"));
   assert.equal((await write(alice, 'delete', `/api/projects/${project}`)).status, 409);
-});
-test('sign-out revokes the session on the server', async () => {
-  assert.equal((await write(alice, 'post', '/api/auth/sign-out')).status, 200);
-  assert.equal((await alice.get('/api/overview')).status, 401);
 });

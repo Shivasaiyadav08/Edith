@@ -2,17 +2,9 @@ import 'dotenv/config';
 import dns from 'node:dns';
 import mongoose from 'mongoose';
 import { createApp } from './app.js';
-import { createAuth } from './lib/auth.js';
-import { mailConfig } from './lib/mail.js';
-if (process.env.NODE_ENV === 'production') mailConfig();
-if (
-  !process.env.MONGO_URI ||
-  !process.env.BETTER_AUTH_SECRET ||
-  process.env.BETTER_AUTH_SECRET.length < 32
-)
-  throw new Error(
-    'Set MONGO_URI and a BETTER_AUTH_SECRET of at least 32 characters. See .env.example.',
-  );
+import Account from './models/Account.js';
+if (!process.env.MONGO_URI || !process.env.CLERK_SECRET_KEY || !process.env.CLERK_PUBLISHABLE_KEY)
+  throw new Error('Set MONGO_URI, CLERK_PUBLISHABLE_KEY, and CLERK_SECRET_KEY. See .env.example.');
 // Some Windows/Node installations report loopback DNS even without a DNS service.
 // Use working public resolvers for Atlas in that specific case, within this process only.
 if (
@@ -36,16 +28,8 @@ try {
   console.error('Connection error:', error.code || error.name);
   process.exit(1);
 }
-// Authentication lookups must be unique, including during simultaneous sign-ups.
-await mongoose.connection.db.collection('auth_users').createIndex({ email: 1 }, { unique: true });
-await mongoose.connection.db
-  .collection('auth_sessions')
-  .createIndex({ token: 1 }, { unique: true });
-await mongoose.connection.db
-  .collection('auth_sessions')
-  .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-const auth = createAuth(mongoose.connection.db);
-const app = createApp(auth);
+await Account.init();
+const app = createApp();
 const server = app.listen(process.env.PORT || 5000, () =>
   console.log('Edith API listening on port', process.env.PORT || 5000),
 );

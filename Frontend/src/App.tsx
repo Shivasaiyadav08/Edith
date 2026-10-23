@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { MotionConfig } from 'motion/react';
-import { authClient } from './lib/api';
+import { useUser } from '@clerk/react';
 import Home from './pages/Home';
 import Auth from './pages/Auth';
 import WorkspaceProvider from './components/WorkspaceProvider';
@@ -46,13 +46,36 @@ function Loading() {
   );
 }
 function Protected() {
-  const { data: session, isPending } = authClient.useSession();
-  if (isPending) return <Loading />;
-  if (!session) return <Navigate to="/login" replace />;
+  const { user, isLoaded, isSignedIn } = useUser();
+  if (!isLoaded) return <Loading />;
+  if (!isSignedIn || !user) return <Navigate to="/login" replace />;
   return (
-    <WorkspaceProvider demo={false} user={session.user}>
+    <WorkspaceProvider
+      demo={false}
+      key={user.id}
+      user={{
+        id: user.id,
+        name: user.fullName || user.username || 'My account',
+        email: user.primaryEmailAddress?.emailAddress || '',
+        emailVerified: user.primaryEmailAddress?.verification.status === 'verified',
+      }}
+    >
       <Shell />
     </WorkspaceProvider>
+  );
+}
+function AuthSetup() {
+  return (
+    <main className="not-found">
+      <h1>Sign-in is being configured.</h1>
+      <p>Please check back shortly.</p>
+      {import.meta.env.DEV && (
+        <p>Add VITE_CLERK_PUBLISHABLE_KEY to Frontend/.env and restart Vite.</p>
+      )}
+      <a className="button button-dark" href="/">
+        Back to Edith
+      </a>
+    </main>
   );
 }
 function Demo() {
@@ -83,6 +106,7 @@ const pages = (
 );
 
 export default function App() {
+  const configured = !!import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
   return (
     <MotionConfig reducedMotion="user">
       <BrowserRouter>
@@ -90,16 +114,16 @@ export default function App() {
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Auth key="login" mode="login" />} />
-            <Route path="/register" element={<Auth key="register" mode="register" />} />
-            <Route path="/forgot-password" element={<Auth key="forgot" mode="forgot" />} />
-            <Route path="/reset-password" element={<Auth key="reset" mode="reset" />} />
             <Route
-              path="/reset-password/:token"
-              element={<Auth key="reset-token" mode="reset" />}
+              path="/login/*"
+              element={configured ? <Auth key="login" mode="login" /> : <AuthSetup />}
             />
-            <Route element={<Protected />}>{pages}</Route>
-            {import.meta.env.DEV && (
+            <Route
+              path="/register/*"
+              element={configured ? <Auth key="register" mode="register" /> : <AuthSetup />}
+            />
+            <Route element={configured ? <Protected /> : <AuthSetup />}>{pages}</Route>
+            {import.meta.env.DEV && configured && (
               <Route path="/demo" element={<Demo />}>
                 <Route index element={<Navigate to="dashboard" replace />} />
                 {pages}

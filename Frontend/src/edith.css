@@ -674,13 +674,7 @@ textarea:focus {
 .expense-title small,
 .expense-title strong,
 .category-bars > div,
-.settings-security p,
-.auth-description,
-.auth-overline,
-.auth-back,
-.auth-switch,
-.auth-footnote,
-.auth-footer {
+.settings-security p {
   color: var(--muted);
 }
 label,
@@ -688,8 +682,7 @@ label,
 .project-card h3,
 .resource-form > p,
 .detail-stats strong,
-.settings-security h2,
-.auth-form-wrap h1 {
+.settings-security h2 {
   color: var(--ink);
 }
 input:not([type='checkbox']),
@@ -789,57 +782,6 @@ input:disabled,
 }
 .stat-card > strong,
 .stat-highlight > strong {
-  color: var(--ink);
-}
-.auth-page {
-  display: block;
-  background: var(--surface);
-  position: relative;
-}
-.auth-main {
-  max-width: 100%;
-  min-height: 100vh;
-  background: var(--surface);
-  padding: 30px 40px;
-}
-.auth-form-wrap {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  padding: 32px;
-  max-width: 410px;
-  border-radius: 14px;
-  margin: auto;
-}
-.auth-theme {
-  position: absolute;
-  right: 30px;
-  top: 24px;
-  z-index: 2;
-}
-.auth-divider span {
-  background: var(--paper);
-  color: var(--muted);
-}
-.auth-divider {
-  border-color: var(--line);
-}
-.auth-form-options {
-  color: var(--muted);
-}
-.google-button {
-  margin-top: 25px;
-  color: var(--ink);
-  background: var(--paper);
-  border-color: var(--line);
-}
-.auth-overline {
-  letter-spacing: 1px;
-  font-size: 8px;
-}
-.auth-form-wrap h1 {
-  font-size: 26px;
-}
-.auth-switch a {
   color: var(--ink);
 }
 /* Ultron is draggable; it never wanders across a form on its own. */
@@ -1304,22 +1246,6 @@ input:disabled,
     font-size: 8px;
     flex-wrap: wrap;
     gap: 10px;
-  }
-  .auth-main {
-    padding: 27px 20px;
-  }
-  .auth-form-wrap {
-    padding: 25px 22px;
-    max-width: 380px;
-    margin-top: 55px;
-    margin-bottom: 55px;
-  }
-  .auth-form-wrap h1 {
-    font-size: 26px;
-  }
-  .auth-theme {
-    right: 20px;
-    top: 22px;
   }
   .edith-chat {
     left: 12px !important;

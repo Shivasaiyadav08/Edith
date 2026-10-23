@@ -1,8 +1,9 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useClerk } from '@clerk/react';
 import { ArrowUpRight, Check, LogOut, X, Sparkles, Menu } from 'lucide-react';
 import { useWorkspace } from '../lib/workspace-context';
-import { authClient, errorMessage } from '../lib/api';
+import { errorMessage } from '../lib/api';
 import { Logo, Spinner } from './ui';
 import ThemeToggle from './ThemeToggle';
 
@@ -19,11 +20,11 @@ export default function Shell() {
   const { demo, prefix, user, loading, error, refresh, toast, notify, openAssistant } =
     useWorkspace();
   const navigate = useNavigate();
+  const { signOut } = useClerk();
   async function logout() {
     try {
       if (!demo) {
-        const result = await authClient.signOut();
-        if (result.error) throw new Error(result.error.message);
+        await signOut();
       }
       navigate('/');
     } catch (err) {

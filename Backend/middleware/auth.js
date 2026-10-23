@@ -1,17 +1,31 @@
-import { fromNodeHeaders } from "better-auth/node";
-import { fail } from "../lib/validation.js";
+import { getAuth } from '@clerk/express';
+import Account from '../models/Account.js';
 
-// Never trust a caller-supplied identity header. Express resolves the socket/proxy IP.
-export const attachClientIP = (req, res, next) => {
-  req.headers['x-edith-client-ip'] = req.ip || req.socket.remoteAddress;
-  next();
-};
+export async function resolveOwner(clerkId) {
+  try {
+    return await Account.findOneAndUpdate(
+      { clerkId },
+      { $setOnInsert: { clerkId } },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
+    );
+  } catch (error) {
+    // Concurrent first requests can race the unique identity index.
+    if (error.code !== 11000) throw error;
+    const account = await Account.findOne({ clerkId });
+    if (!account) throw error;
+    return account;
+  }
+}
 
-export const requireAuth = (auth) => async (req, res, next) => {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(req.headers),
-  });
-  if (!session) fail(401, "Your session has expired. Please sign in again.");
-  req.user = session.user;
-  next();
-};
+export async function requireAuth(req, res, next) {
+  try {
+    const { userId, isAuthenticated } = getAuth(req, { acceptsToken: 'session_token' });
+    if (!isAuthenticated || !userId)
+      return res.status(401).json({ message: 'Please sign in to continue.' });
+    const account = await resolveOwner(userId);
+    req.user = { id: account.owner.toString() };
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
