@@ -87,6 +87,7 @@ export default function Expenses() {
   return (
     <>
       <PageHeading
+        shortTitle="Expenses"
         eyebrow="THE DETAILS ADD UP"
         title="Every expense, in its place."
         description="A little clarity about where it all goes. Your spending, connected to your work."
@@ -158,7 +159,7 @@ export default function Expenses() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Find an expense..."
+            placeholder="Search expenses…"
             aria-label="Search expenses"
           />
         </label>
@@ -192,7 +193,7 @@ export default function Expenses() {
         </div>
       ) : filtered.length ? (
         <div className="table-panel">
-          <table className="responsive-table">
+          <table className="responsive-table expenses-table">
             <thead>
               <tr>
                 <th>Expense</th>
@@ -260,6 +261,7 @@ export default function Expenses() {
                       }}
                     >
                       <Trash2 size={15} />
+                      <span className="mobile-only">Delete expense</span>
                     </button>
                   </td>
                 </tr>

@@ -1,19 +1,32 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useClerk } from '@clerk/react';
-import { ArrowUpRight, Check, LogOut, X, Sparkles, Menu } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Check,
+  LogOut,
+  X,
+  Sparkles,
+  Menu,
+  LayoutDashboard,
+  FolderKanban,
+  ListTodo,
+  ReceiptText,
+  ChartNoAxesCombined,
+  Settings2,
+} from 'lucide-react';
 import { useWorkspace } from '../lib/workspace-context';
 import { errorMessage } from '../lib/api';
 import { Logo, Spinner } from './ui';
 import ThemeToggle from './ThemeToggle';
 
 const links = [
-  ['/dashboard', 'Overview'],
-  ['/projects', 'Projects'],
-  ['/tasks', 'Tasks'],
-  ['/expenses', 'Expenses'],
-  ['/reports', 'Reports'],
-  ['/settings', 'Settings'],
+  { path: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+  { path: '/projects', label: 'Projects', icon: FolderKanban },
+  { path: '/tasks', label: 'Tasks', icon: ListTodo },
+  { path: '/expenses', label: 'Expenses', icon: ReceiptText },
+  { path: '/reports', label: 'Reports', icon: ChartNoAxesCombined },
+  { path: '/settings', label: 'Settings', icon: Settings2 },
 ];
 export default function Shell() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -44,8 +57,9 @@ export default function Shell() {
             aria-label="Workspace navigation"
             className={menuOpen ? 'is-open' : ''}
           >
-            {links.map(([path, label]) => (
+            {links.map(({ path, label, icon: Icon }) => (
               <NavLink key={path} to={`${prefix}${path}`} onClick={() => setMenuOpen(false)}>
+                <Icon size={17} aria-hidden="true" />
                 {label}
               </NavLink>
             ))}

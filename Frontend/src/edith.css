@@ -694,7 +694,6 @@ select,
 .modal,
 .modal-header,
 .empty-state,
-.report-range,
 .expense-category-summary {
   background: var(--paper);
   color: var(--ink);
@@ -1086,8 +1085,6 @@ input:disabled,
 @media (max-width: 680px) {
   .product-nav {
     flex-wrap: wrap;
-    padding: 17px 17px 12px;
-    gap: 17px;
   }
   .product-nav > nav {
     order: 3;
@@ -1106,9 +1103,6 @@ input:disabled,
     margin-left: auto;
     gap: 9px;
   }
-  .brand {
-    font-size: 23px;
-  }
   .nav-tools .button {
     font-size: 9px;
     padding: 8px 10px;
@@ -1118,9 +1112,6 @@ input:disabled,
   }
   .product-nav .nav-tools > .avatar {
     display: none;
-  }
-  .workspace-content {
-    padding: 22px 16px;
   }
   .demo-banner {
     padding: 9px 16px;
@@ -1132,67 +1123,25 @@ input:disabled,
   }
   .overview-heading {
     flex-wrap: wrap;
-    gap: 17px;
-    margin-bottom: 21px;
-  }
-  .overview-heading h1 {
-    font-size: 34px;
-  }
-  .overview-heading p {
-    font-size: 10px;
   }
   .overview-actions {
-    width: 100%;
     justify-content: space-between;
   }
   .period-pill {
     font-size: 8px;
   }
-  .overview-grid {
-    grid-template-columns: 1fr;
-    gap: 13px;
-  }
-  .spending-card,
-  .budget-volume,
-  .latest-card,
-  .edith-insight {
-    grid-column: auto;
-    grid-row: auto;
-  }
-  .data-card {
-    padding: 17px;
-    border-radius: 11px;
-  }
   .spending-card {
     padding-bottom: 12px;
   }
   .inline-metrics {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px 10px;
     margin: 22px 0 13px;
-  }
-  .inline-metrics > div:nth-child(n + 4) {
-    display: none;
-  }
-  .inline-metrics span {
-    font-size: 9px;
-  }
-  .inline-metrics strong {
-    font-size: 15px;
   }
   .striped-chart {
     height: 162px;
     gap: 5px;
   }
   .striped-bar > span {
-    font-size: 8px;
     left: 1px;
-  }
-  .chart-column > small {
-    font-size: 8px;
-  }
-  .inline-ask label {
-    font-size: 8px;
   }
   .inline-ask input::placeholder {
     font-size: 8px;
@@ -1220,15 +1169,6 @@ input:disabled,
   .completion-footer {
     font-size: 9px;
   }
-  .compact-expense strong {
-    font-size: 10px;
-  }
-  .compact-expense small {
-    font-size: 8px;
-  }
-  .compact-expense b {
-    font-size: 11px;
-  }
   .edith-insight {
     min-height: 225px;
   }
@@ -1242,17 +1182,11 @@ input:disabled,
     font-size: 8px;
   }
   .workspace-footer {
-    padding: 17px;
-    font-size: 8px;
     flex-wrap: wrap;
-    gap: 10px;
   }
   .edith-chat {
     left: 12px !important;
-    right: 12px;
     top: 13px !important;
-    width: calc(100vw - 24px);
-    max-height: calc(100dvh - 95px);
     border-radius: 13px;
   }
   .edith-chat-content {
@@ -1268,9 +1202,6 @@ input:disabled,
   }
   .page-heading .eyebrow {
     font-size: 7px;
-  }
-  .page-heading h1 {
-    font-size: 24px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

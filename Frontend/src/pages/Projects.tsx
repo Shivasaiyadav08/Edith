@@ -29,6 +29,7 @@ export default function Projects() {
   return (
     <>
       <PageHeading
+        shortTitle="Projects"
         eyebrow="THE BIG PICTURE"
         title="Good ideas, in motion."
         description="A home for the work you care about. Keep every moving part connected."
@@ -53,7 +54,12 @@ export default function Projects() {
             ['completed', 'Completed'],
             ['on-hold', 'On hold'],
           ].map(([v, label]) => (
-            <button key={v} className={filter === v ? 'active' : ''} onClick={() => setFilter(v)}>
+            <button
+              key={v}
+              aria-pressed={filter === v}
+              className={filter === v ? 'active' : ''}
+              onClick={() => setFilter(v)}
+            >
               {label}
               {v === 'all' && <span>{data.projects.length}</span>}
             </button>
@@ -63,7 +69,7 @@ export default function Projects() {
           <Search size={16} />
           <input
             aria-label="Search projects"
-            placeholder="Find a project..."
+            placeholder="Search projects…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />

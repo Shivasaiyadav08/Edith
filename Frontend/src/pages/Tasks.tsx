@@ -70,6 +70,7 @@ export default function Tasks() {
   return (
     <>
       <PageHeading
+        shortTitle="Tasks"
         eyebrow="ONE STEP AT A TIME"
         title="Make room for meaningful work."
         description="Small steps make big things happen. Here’s what’s on your plate."
@@ -105,7 +106,12 @@ export default function Tasks() {
             ['in-progress', 'In progress'],
             ['done', 'Done'],
           ].map(([v, label]) => (
-            <button key={v} className={filter === v ? 'active' : ''} onClick={() => setFilter(v)}>
+            <button
+              key={v}
+              aria-pressed={filter === v}
+              className={filter === v ? 'active' : ''}
+              onClick={() => setFilter(v)}
+            >
               {label}
             </button>
           ))}
@@ -113,17 +119,21 @@ export default function Tasks() {
         <div className="view-toggle">
           <button
             aria-label="List view"
+            aria-pressed={!board}
             className={!board ? 'active' : ''}
             onClick={() => setBoard(false)}
           >
             <List size={16} />
+            <span className="mobile-only">List</span>
           </button>
           <button
             aria-label="Board view"
+            aria-pressed={board}
             className={board ? 'active' : ''}
             onClick={() => setBoard(true)}
           >
             <Columns3 size={16} />
+            <span className="mobile-only">Board</span>
           </button>
         </div>
       </div>
@@ -132,7 +142,7 @@ export default function Tasks() {
           <Search size={16} />
           <input
             aria-label="Search tasks"
-            placeholder="Find your next step..."
+            placeholder="Search tasks…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -195,7 +205,7 @@ export default function Tasks() {
         </div>
       ) : (
         <div className="table-panel">
-          <table className="responsive-table">
+          <table className="responsive-table tasks-table">
             <thead>
               <tr>
                 <th />

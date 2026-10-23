@@ -15,6 +15,7 @@ export default function Settings() {
   return (
     <>
       <PageHeading
+        shortTitle="Settings"
         eyebrow="MAKE YOURSELF AT HOME"
         title="Your space. Your way."
         description="The essentials for your account, all in one place."

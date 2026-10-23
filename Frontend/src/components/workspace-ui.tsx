@@ -7,7 +7,6 @@ import {
   X,
   AlertTriangle,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useWorkspace } from '../lib/workspace-context';
 import type { Project, Resource, Snapshot } from '../lib/types';
@@ -135,28 +134,6 @@ export function ProjectCard({ project, onClick }: { project: Project; onClick: (
         <span>Due {shortDate(project.dueDate)}</span>
       </div>
     </button>
-  );
-}
-export function SectionTitle({
-  title,
-  to,
-  children,
-}: {
-  title: string;
-  to?: string;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="section-title">
-      <h2>{title}</h2>
-      {to ? (
-        <Link className="text-link" to={to}>
-          View all <ArrowUpRight size={14} />
-        </Link>
-      ) : (
-        children
-      )}
-    </div>
   );
 }
 export function DeleteConfirm({

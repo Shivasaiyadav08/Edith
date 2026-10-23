@@ -89,17 +89,6 @@
   color: #d65c4d !important;
   font-weight: 500;
 }
-.report-range {
-  flex-wrap: wrap;
-  gap: 16px;
-}
-.report-range > label:first-child {
-  margin-right: auto;
-  min-width: 210px;
-}
-.report-range > span {
-  margin-right: 0;
-}
 .edith-chat .assistant-answer {
   white-space: normal;
   font-size: 13px;
@@ -271,68 +260,20 @@
   .project-filter {
     width: 100%;
   }
-  .finance-summary {
-    padding: 17px;
-  }
   .finance-caption {
     display: block;
   }
   .finance-caption > span {
     display: block;
     margin-top: 8px;
-    line-height: 1.7;
   }
   .finance-grid {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  .finance-grid article {
-    padding: 17px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .finance-grid article > span {
-    margin: 0;
-  }
-  .finance-grid article > strong {
-    font-size: 25px;
-  }
-  .finance-summary > small {
-    line-height: 1.8;
-  }
-  .report-range > label:first-child {
-    min-width: 0;
-    width: 100%;
-  }
-  .inline-metrics span {
-    font-size: 8px;
-  }
-  .inline-metrics strong {
-    font-size: 16px;
-  }
-  .card-heading h2 {
-    font-size: 13px;
-  }
 }
 
 /* Shared date controls and keyboard-accessible expense rows. */
-.report-range {
-  margin-bottom: 22px;
-}
-.date-filter > small {
-  flex-basis: 100%;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.6;
-}
-.report-date-note {
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.8;
-  margin: -8px 0 22px;
-}
 .expense-row {
   cursor: pointer;
 }

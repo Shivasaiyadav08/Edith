@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { ArrowUpRight, LoaderCircle, X, Layers2 } from 'lucide-react';
+import { LoaderCircle, X, Layers2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 export function Logo({ light = false }: { light?: boolean }) {
   return (
@@ -38,11 +38,13 @@ export function Empty({
 export function PageHeading({
   eyebrow,
   title,
+  shortTitle,
   description,
   action,
 }: {
   eyebrow?: string;
   title: string;
+  shortTitle?: string;
   description: string;
   action?: ReactNode;
 }) {
@@ -50,7 +52,10 @@ export function PageHeading({
     <div className="page-heading">
       <div>
         {eyebrow && <span className="eyebrow">{eyebrow}</span>}
-        <h1>{title}</h1>
+        <h1>
+          <span className={shortTitle ? 'heading-full' : undefined}>{title}</span>
+          {shortTitle && <span className="heading-compact">{shortTitle}</span>}
+        </h1>
         <p>{description}</p>
       </div>
       {action}
@@ -123,13 +128,5 @@ export function Modal({
         {children}
       </div>
     </div>
-  );
-}
-export function ArrowLink({ to, children }: { to: string; children: ReactNode }) {
-  return (
-    <Link to={to} className="text-link">
-      {children}
-      <ArrowUpRight size={16} />
-    </Link>
   );
 }

@@ -21,12 +21,11 @@ import useReport from '../lib/useReport';
 import FinancialSummary from '../components/FinancialSummary';
 import { downloadCSV } from '../lib/download';
 import { errorMessage } from '../lib/api';
+import DateFilter from '../components/DateFilter';
 export default function Reports() {
   const { data, workspace, prefix, notify, demo } = useWorkspace();
   const [exporting, setExporting] = useState(false);
-  const [from, setFrom] = useState(''),
-    [to, setTo] = useState(''),
-    [project, setProject] = useState(''),
+  const [project, setProject] = useState(''),
     [period, setPeriod] = useState({ from: '', to: '' });
   const report = useReport(project, period.from, period.to);
   const { busy } = report;
@@ -42,6 +41,7 @@ export default function Reports() {
   return (
     <>
       <PageHeading
+        shortTitle="Reports"
         eyebrow="A CLEARER PERSPECTIVE"
         title="See how it all adds up."
         description="The big picture, grounded in your actual work and spending."
@@ -71,16 +71,12 @@ export default function Reports() {
           </div>
         }
       />
-      <form
-        className="report-range"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (from && to && from > to) {
-            notify('Choose an end date after the start date.');
-            return;
-          }
-          setPeriod({ from, to });
-        }}
+      <DateFilter
+        onApply={setPeriod}
+        active={!!project}
+        busy={busy}
+        onClear={() => setProject('')}
+        description="Dates apply to project/task creation and expense transactions. Budget, revenue, and profit use all-time values for matching projects. Exports include every matching record, beyond the first 100."
       >
         <label>
           Project
@@ -97,38 +93,7 @@ export default function Reports() {
             ))}
           </select>
         </label>
-        <span>Reporting period</span>
-        <label>
-          From
-          <input type="date" value={from} onInput={(e) => setFrom(e.currentTarget.value)} />
-        </label>
-        <label>
-          To
-          <input type="date" value={to} onInput={(e) => setTo(e.currentTarget.value)} />
-        </label>
-        <button className="button button-dark" disabled={busy}>
-          {busy ? <Spinner /> : 'Apply dates'}
-        </button>
-        {(project || selectedPeriod) && (
-          <button
-            type="button"
-            className="button button-ghost"
-            onClick={() => {
-              setPeriod({ from: '', to: '' });
-              setProject('');
-              setFrom('');
-              setTo('');
-            }}
-          >
-            Clear
-          </button>
-        )}
-      </form>
-      <p className="report-date-note">
-        Dates apply to project/task creation and expense transactions. Project budgets, revenue, and
-        profit/loss are all-time for projects created in the selected range. Export includes every
-        matching record, including those beyond the first 100.
-      </p>
+      </DateFilter>
       {report.error && (
         <p role="alert" className="form-alert error">
           {report.error}
